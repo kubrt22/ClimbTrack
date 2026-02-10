@@ -48,7 +48,10 @@ Future<void> register({
   required String username,
   required Function(bool) setLoading,
 }) async {
-  if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+  if (email.isEmpty ||
+      password.isEmpty ||
+      confirmPassword.isEmpty ||
+      username.isEmpty) {
     showError(context, 'Please fill in all fields');
     return;
   }
@@ -77,5 +80,31 @@ Future<void> register({
     }
   } finally {
     setLoading(false);
+  }
+}
+
+Future<void> resetPassword({
+  required BuildContext context,
+  required WidgetRef ref,
+  required String email,
+}) async {
+  if (email.isEmpty) {
+    showError(context, 'Please enter your email');
+    return;
+  }
+
+  final auth = ref.read(authServiceProvider);
+
+  try {
+    await auth.sendPasswordResetEmail(email.trim());
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Password reset email sent')));
+    }
+  } on FirebaseAuthException catch (e) {
+    if (context.mounted) {
+      showError(context, '$e');
+    }
   }
 }

@@ -24,6 +24,10 @@ class AuthServices {
     return _auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
+  Future<void> sendPasswordResetEmail(String email) {
+    return _auth.sendPasswordResetEmail(email: email);
+  }
+
   //Sign Out
   Future<void> signOut() async {
     await _auth.signOut();

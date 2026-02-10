@@ -34,6 +34,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
+  Future<void> _resetPassword() async {
+    await resetPassword(
+      context: context,
+      ref: ref,
+      email: _emailcontroller.text,
+    );
+  }
+
   void _togglePasswordVisibility() {
     setState(() {
       _isObscure = !_isObscure;
@@ -69,7 +77,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             obscureText: _isObscure,
           ),
           TextButton(
-            onPressed: _isLoading ? null : () {},
+            onPressed: _isLoading ? null : _resetPassword,
             child: Text('Forgot password?'),
           ),
           FilledButton(
