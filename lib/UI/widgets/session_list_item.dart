@@ -81,7 +81,7 @@ class _SessionListTileState extends ConsumerState<SessionListTile> {
                   ),
                 ),
               ),
-              Container(
+              Ink(
                 width: 8.0,
                 height: double.infinity,
                 decoration: BoxDecoration(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:climb_track/UI/widgets/session_list_iten.dart';
+import 'package:climb_track/UI/widgets/session_list_item.dart';
+import 'package:climb_track/UI/widgets/route_list_item.dart';
 import 'package:climb_track/services/global_things.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/provider/auth_provider.dart';
@@ -84,14 +85,34 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                       ][index % 9]]!,
                 ),
               ),
-              ListView(
-                children: List.generate(
-                  20,
-                  (index) => ListTile(
-                    title: Text('Cesta ${index + 1}'),
-                    subtitle: Text('Details about cesta ${index + 1}'),
+              ListView.separated(
+                itemBuilder: (context, index) => RouteListTile(
+                  title: 'Cesta ${index + 1}',
+                  location: 'Location ${index + 1}',
+                  date: DateTime.now(),
+                  climbType: ClimbType.Boulder,
+                  difficulty: Difficulty(
+                    DifficultyType.V_Scale,
+                    "V${index + 1}",
                   ),
+                  climbStyle: ClimbStyle.Flash,
+                  color:
+                      Colors.blue[[
+                        100,
+                        200,
+                        300,
+                        400,
+                        500,
+                        600,
+                        700,
+                        800,
+                        900,
+                      ][index % 9]]!,
                 ),
+                padding: const EdgeInsets.all(8.0),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 8.0),
+                itemCount: 20,
               ),
             ],
           ),
