@@ -33,6 +33,15 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     }
   }
 
+  FloatingActionButton? _buildFloatingActionButton() {
+    switch (_currentIndex) {
+      case 0:
+        return OverviewPage.buildFAB(ref);
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +50,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         currentIndex: _currentIndex,
         onDestinationSelected: _onDestinationSelected,
       ),
+
+      floatingActionButton: _buildFloatingActionButton(),
       body: <Widget>[
         // - Home page
         OverviewPage(),

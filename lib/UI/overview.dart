@@ -5,6 +5,7 @@ import 'package:climb_track/UI/widgets/route_list_item.dart';
 import 'package:climb_track/services/global_things.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/provider/auth_provider.dart';
+import 'package:climb_track/provider/riverpod.dart';
 
 class OverviewPage extends ConsumerStatefulWidget {
   const OverviewPage({super.key});
@@ -25,6 +26,20 @@ class OverviewPage extends ConsumerStatefulWidget {
       ],
     );
   }
+
+  static FloatingActionButton buildFAB(WidgetRef ref) {
+    final tabIndex = ref.watch(overviewTabIndexProvider);
+    return FloatingActionButton(
+      onPressed: () {
+        if (tabIndex == 0) {
+          print("Add new session");
+        } else {
+          print("Add new route");
+        }
+      },
+      child: const Icon(Icons.add),
+    );
+  }
 }
 
 class _OverviewPageState extends ConsumerState<OverviewPage>
@@ -35,6 +50,13 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        ref
+            .read(overviewTabIndexProvider.notifier)
+            .setIndex(_tabController.index);
+      }
+    });
   }
 
   @override
