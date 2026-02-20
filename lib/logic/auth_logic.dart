@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/provider/auth_provider.dart';
-
-void showError(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message), backgroundColor: Colors.red[900]),
-  );
-}
+import 'package:climb_track/services/global_things.dart';
 
 Future<void> signIn({
   required BuildContext context,

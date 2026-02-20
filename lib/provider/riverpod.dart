@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:climb_track/provider/auth_provider.dart';
 
 class OverviewTabNotifier extends Notifier<int> {
   @override

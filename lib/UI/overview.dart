@@ -6,6 +6,9 @@ import 'package:climb_track/services/global_things.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/provider/auth_provider.dart';
 import 'package:climb_track/provider/riverpod.dart';
+import 'package:climb_track/provider/firebase_provider.dart';
+import 'package:climb_track/models/route_model.dart';
+import 'package:climb_track/models/session_model.dart';
 
 class OverviewPage extends ConsumerStatefulWidget {
   const OverviewPage({super.key});
@@ -31,10 +34,32 @@ class OverviewPage extends ConsumerStatefulWidget {
     final tabIndex = ref.watch(overviewTabIndexProvider);
     return FloatingActionButton(
       onPressed: () {
+        final user = ref.read(authStateProvider).value;
+        if (user == null) return;
+        final firestore = ref.read(firestoreServiceProvider);
         if (tabIndex == 0) {
-          print("Add new session");
+          final session = SessionModel(
+            id: '',
+            title: 'Nová session',
+            location: 'Neznámé místo',
+            durationMinutes: 90,
+            routeIds: ["6WhEwGgBmPUGP1gci0wI"],
+            createdAt: DateTime.now(),
+          );
+          firestore.addSession(user.uid, session);
         } else {
-          print("Add new route");
+          final route = RouteModel(
+            id: '',
+            title: 'Nová cesta',
+            location: 'Neznámé místo',
+            date: DateTime.now(),
+            climbType: ClimbType.Boulder,
+            climbStyle: ClimbStyle.Flash,
+            difficulty: Difficulty(DifficultyType.V_Scale, "V9"),
+            routeColor: 0xFF2196F3,
+            createdAt: DateTime.now(),
+          );
+          firestore.addRoute(user.uid, route);
         }
       },
       child: const Icon(Icons.add),
@@ -67,6 +92,9 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
 
   @override
   Widget build(BuildContext context) {
+    final sessionsAsync = ref.watch(sessionsStreamProvider);
+    final routesAsync = ref.watch(routesStreamProvider);
+
     return Column(
       children: [
         TabBar(
@@ -80,61 +108,60 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
           child: TabBarView(
             controller: _tabController,
             children: [
-              ListView.separated(
-                padding: const EdgeInsets.all(8.0),
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 8.0),
-                itemCount: 20,
-                itemBuilder: (context, index) => SessionListTile(
-                  title: 'Session ${index + 1}',
-                  location: 'Location ${index + 1}',
-                  ascentsCount: index + 1,
-                  difficulty: Difficulty(
-                    DifficultyType.V_Scale,
-                    "V${index + 1}",
-                  ),
-                  color:
-                      Colors.red[[
-                        100,
-                        200,
-                        300,
-                        400,
-                        500,
-                        600,
-                        700,
-                        800,
-                        900,
-                      ][index % 9]]!,
-                ),
+              sessionsAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Center(child: Text('Error: $err')),
+                data: (sessions) => sessions.isEmpty
+                    ? const Center(child: Text('No sessions yet'))
+                    : ListView.separated(
+                        padding: const EdgeInsets.all(8.0),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 8.0),
+                        itemCount: sessions.length,
+                        itemBuilder: (context, index) {
+                          final s = sessions[index];
+                          final sessionRoutes = ref.watch(
+                            sessionRoutesProvider(s.routeIds),
+                          );
+                          return sessionRoutes.when(
+                            loading: () => const SizedBox.shrink(),
+                            error: (err, stack) => const SizedBox.shrink(),
+                            data: (routes) => SessionListTile(
+                              title: s.title,
+                              location: s.location,
+                              ascentsCount: s.routeIds.length,
+                              difficulty: routes.isNotEmpty
+                                  ? routes[0].difficulty
+                                  : Difficulty(DifficultyType.V_Scale, "V0"),
+                              color: Color(0xFF2196F3),
+                            ),
+                          );
+                        },
+                      ),
               ),
-              ListView.separated(
-                itemBuilder: (context, index) => RouteListTile(
-                  title: 'Cesta ${index + 1}',
-                  location: 'Location ${index + 1}',
-                  date: DateTime.now(),
-                  climbType: ClimbType.Boulder,
-                  difficulty: Difficulty(
-                    DifficultyType.V_Scale,
-                    "V${index + 1}",
-                  ),
-                  climbStyle: ClimbStyle.Flash,
-                  color:
-                      Colors.blue[[
-                        100,
-                        200,
-                        300,
-                        400,
-                        500,
-                        600,
-                        700,
-                        800,
-                        900,
-                      ][index % 9]]!,
-                ),
-                padding: const EdgeInsets.all(8.0),
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 8.0),
-                itemCount: 20,
+              routesAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Center(child: Text('Error: $err')),
+                data: (routes) => routes.isEmpty
+                    ? const Center(child: Text('No routes yet'))
+                    : ListView.separated(
+                        padding: const EdgeInsets.all(8.0),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 8.0),
+                        itemCount: routes.length,
+                        itemBuilder: (context, index) {
+                          final r = routes[index];
+                          return RouteListTile(
+                            title: r.title,
+                            location: r.location,
+                            date: r.date,
+                            climbType: r.climbType,
+                            climbStyle: r.climbStyle,
+                            difficulty: r.difficulty,
+                            color: Color(r.routeColor),
+                          );
+                        },
+                      ),
               ),
             ],
           ),

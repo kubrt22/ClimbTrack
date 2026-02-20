@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 // ignore_for_file: constant_identifier_names
 
 enum DifficultyType { UIAA, French, V_Scale, Font }
@@ -12,3 +14,9 @@ class Difficulty {
 enum ClimbType { Boulder, Toprope, Lead }
 
 enum ClimbStyle { Onsight, Flash }
+
+void showError(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(message), backgroundColor: Colors.red[900]),
+  );
+}

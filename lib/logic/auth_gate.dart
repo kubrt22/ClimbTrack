@@ -10,11 +10,9 @@ class AuthGate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const MainScreen();
-    // ignore: dead_code
     final userAsync = ref.watch(authStateProvider);
     if (userAsync.isLoading) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (userAsync.value != null) {
       return const MainScreen();
