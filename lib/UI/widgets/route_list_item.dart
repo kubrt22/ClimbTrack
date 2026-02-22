@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/services/global_things.dart';
+import 'package:climb_track/UI/routes/route_details.dart';
 
 class RouteListTile extends ConsumerStatefulWidget {
+  final String id;
+
   final String title;
   final String location;
   final DateTime date;
   final ClimbType climbType;
   final Difficulty difficulty;
-  final ClimbStyle climbStyle;
+  final ClimbStyle? climbStyle;
   final Color color;
 
   const RouteListTile({
     super.key,
+    required this.id,
     required this.title,
     required this.location,
     required this.date,
@@ -27,7 +31,14 @@ class RouteListTile extends ConsumerStatefulWidget {
 }
 
 class _RouteListTileState extends ConsumerState<RouteListTile> {
-  void _openRouteDetails() {}
+  void _openRouteDetails() {
+    Navigator.push(
+      ref.context,
+      MaterialPageRoute(
+        builder: (context) => RouteDetailsPage(routeId: widget.id),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +110,7 @@ class _RouteListTileState extends ConsumerState<RouteListTile> {
                       ).textTheme.bodyMedium!.copyWith(color: Colors.white),
                     ),
                     Text(
-                      widget.climbStyle.name,
+                      widget.climbStyle?.name ?? '',
                       style: Theme.of(
                         context,
                       ).textTheme.bodyMedium!.copyWith(color: Colors.white),

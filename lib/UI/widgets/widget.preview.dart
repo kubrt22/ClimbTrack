@@ -31,6 +31,7 @@ Widget routeListTilePreview() {
       home: Scaffold(
         body: Center(
           child: RouteListTile(
+            id: 'preview_route_id',
             title: 'The Nose',
             location: 'Yosemite',
             date: DateTime.now(),

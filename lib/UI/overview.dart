@@ -7,8 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/provider/auth_provider.dart';
 import 'package:climb_track/provider/riverpod.dart';
 import 'package:climb_track/provider/firebase_provider.dart';
-import 'package:climb_track/models/route_model.dart';
 import 'package:climb_track/models/session_model.dart';
+import 'package:climb_track/UI/routes/route_add.dart';
 
 class OverviewPage extends ConsumerStatefulWidget {
   const OverviewPage({super.key});
@@ -48,18 +48,10 @@ class OverviewPage extends ConsumerStatefulWidget {
           );
           firestore.addSession(user.uid, session);
         } else {
-          final route = RouteModel(
-            id: '',
-            title: 'Nová cesta',
-            location: 'Neznámé místo',
-            date: DateTime.now(),
-            climbType: ClimbType.Boulder,
-            climbStyle: ClimbStyle.Flash,
-            difficulty: Difficulty(DifficultyType.V_Scale, "V9"),
-            routeColor: 0xFF2196F3,
-            createdAt: DateTime.now(),
+          Navigator.push(
+            ref.context,
+            MaterialPageRoute(builder: (context) => RouteAddPage()),
           );
-          firestore.addRoute(user.uid, route);
         }
       },
       child: const Icon(Icons.add),
@@ -126,15 +118,26 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                           return sessionRoutes.when(
                             loading: () => const SizedBox.shrink(),
                             error: (err, stack) => const SizedBox.shrink(),
-                            data: (routes) => SessionListTile(
-                              title: s.title,
-                              location: s.location,
-                              ascentsCount: s.routeIds.length,
-                              difficulty: routes.isNotEmpty
-                                  ? routes[0].difficulty
-                                  : Difficulty(DifficultyType.V_Scale, "V0"),
-                              color: Color(0xFF2196F3),
-                            ),
+                            data: (routes) {
+                              final sorted = List.from(routes);
+                              sorted.sort(
+                                (a, b) => b.difficulty.index.compareTo(
+                                  a.difficulty.index,
+                                ),
+                              );
+
+                              return SessionListTile(
+                                title: s.title,
+                                location: s.location,
+                                ascentsCount: sorted.length,
+                                difficulty: sorted.isNotEmpty
+                                    ? sorted.first.difficulty
+                                    : Difficulty(DifficultyType.V_Scale, "V0"),
+                                color: sorted.isNotEmpty
+                                    ? sorted.first.routeColor
+                                    : Colors.grey,
+                              );
+                            },
                           );
                         },
                       ),
@@ -152,13 +155,14 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                         itemBuilder: (context, index) {
                           final r = routes[index];
                           return RouteListTile(
+                            id: r.id,
                             title: r.title,
                             location: r.location,
                             date: r.date,
                             climbType: r.climbType,
                             climbStyle: r.climbStyle,
                             difficulty: r.difficulty,
-                            color: Color(r.routeColor),
+                            color: r.routeColor,
                           );
                         },
                       ),

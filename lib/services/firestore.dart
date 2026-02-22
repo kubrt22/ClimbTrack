@@ -114,6 +114,24 @@ class FirestoreService {
         });
   }
 
+  Future<RouteModel?> getRoute(String uid, String routeId) async {
+    try {
+      final doc = await _routesRef(uid).doc(routeId).get();
+      if (doc.exists) {
+        return RouteModel.fromFirestore(doc);
+      } else {
+        log('Route with ID $routeId not found for user $uid');
+        return null;
+      }
+    } on FirebaseException catch (e) {
+      log('Firestore error fetching route: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error fetching route: $e');
+      rethrow;
+    }
+  }
+
   Future<void> addRoute(String uid, RouteModel route) async {
     try {
       await _routesRef(uid).add(route.toFirestore());

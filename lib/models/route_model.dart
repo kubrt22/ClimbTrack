@@ -14,9 +14,9 @@ class RouteModel {
   final String location;
   final DateTime date;
   final ClimbType climbType;
-  final ClimbStyle climbStyle;
+  final ClimbStyle? climbStyle;
   final Difficulty difficulty;
-  final int routeColor;
+  final Color routeColor;
   final List<Image> images;
   final String notes;
 
@@ -43,12 +43,14 @@ class RouteModel {
       location: data['location'] ?? '',
       date: (data['date'] as Timestamp).toDate(),
       climbType: ClimbType.values.byName(data['climbType']),
-      climbStyle: ClimbStyle.values.byName(data['climbStyle']),
+      climbStyle: data['climbStyle'] != null
+          ? ClimbStyle.values.byName(data['climbStyle'])
+          : null,
       difficulty: Difficulty(
         DifficultyType.values.byName(data['difficultyType']),
         data['difficultyValue'] ?? '',
       ),
-      routeColor: data['routeColor'] ?? 0xFF2196F3,
+      routeColor: Color(data['routeColor'] as int),
       notes: data['notes'] ?? '',
     );
   }
@@ -60,10 +62,10 @@ class RouteModel {
       'location': location,
       'date': Timestamp.fromDate(date),
       'climbType': climbType.name,
-      'climbStyle': climbStyle.name,
+      'climbStyle': climbStyle?.name,
       'difficultyType': difficulty.type.name,
       'difficultyValue': difficulty.value,
-      'routeColor': routeColor,
+      'routeColor': routeColor.toARGB32(),
       'notes': notes,
     };
   }
