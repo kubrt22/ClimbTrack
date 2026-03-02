@@ -19,7 +19,7 @@ class _RouteAddPageState extends ConsumerState<RouteAddPage> {
   String _location = '';
   DifficultyType? _selectedType = DifficultyType.V_Scale;
   String _selectedValue = difficultyValues[DifficultyType.V_Scale]!.first;
-  Color _selectedColor = Colors.white;
+  Color _selectedColor = Colors.black;
   DateTime _selectedDate = DateTime.now();
   ClimbType? _selectedClimbType;
   Set<ClimbStyle> _selectedClimbStyle = {};

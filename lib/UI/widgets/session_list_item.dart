@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/services/global_things.dart';
+import 'package:climb_track/UI/session/session_details.dart';
 
 class SessionListTile extends ConsumerStatefulWidget {
+  final String id;
   final String title;
   final String location;
   final int ascentsCount;
@@ -11,6 +13,7 @@ class SessionListTile extends ConsumerStatefulWidget {
 
   const SessionListTile({
     super.key,
+    required this.id,
     required this.title,
     required this.location,
     required this.ascentsCount,
@@ -23,7 +26,14 @@ class SessionListTile extends ConsumerStatefulWidget {
 }
 
 class _SessionListTileState extends ConsumerState<SessionListTile> {
-  void _openSessionDetails() {}
+  void _openSessionDetails() {
+    Navigator.push(
+      ref.context,
+      MaterialPageRoute(
+        builder: (context) => SessionDetailsPage(sessionId: widget.id),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

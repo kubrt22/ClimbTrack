@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class SessionModel {
   // Hidden
@@ -8,7 +9,8 @@ class SessionModel {
   // Visible
   final String title;
   final String location;
-  final int durationMinutes;
+  final DateTime date;
+  final TimeOfDay? duration;
   final String notes;
   final List<String> routeIds;
 
@@ -17,18 +19,11 @@ class SessionModel {
     required this.createdAt,
     required this.title,
     required this.location,
-    required this.durationMinutes,
+    required this.date,
+    required this.duration,
     this.notes = '',
     this.routeIds = const [],
   });
-
-  String get formattedDuration {
-    final h = durationMinutes ~/ 60;
-    final m = durationMinutes % 60;
-    if (h == 0) return '${m}min';
-    if (m == 0) return '${h}h';
-    return '${h}h ${m}min';
-  }
 
   factory SessionModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -36,7 +31,13 @@ class SessionModel {
       id: doc.id,
       title: data['title'] ?? '',
       location: data['location'] ?? '',
-      durationMinutes: data['durationMinutes'] ?? 0,
+      date: (data['date'] as Timestamp).toDate(),
+      duration: data['durationMinutes'] == null
+          ? null
+          : TimeOfDay(
+              hour: (data['durationMinutes'] as int) ~/ 60,
+              minute: (data['durationMinutes'] as int) % 60,
+            ),
       notes: data['notes'] ?? '',
       routeIds: List<String>.from(data['routeIds'] ?? []),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
@@ -47,7 +48,10 @@ class SessionModel {
     return {
       'title': title,
       'location': location,
-      'durationMinutes': durationMinutes,
+      'date': Timestamp.fromDate(date),
+      'durationMinutes': duration == null
+          ? null
+          : duration!.hour * 60 + duration!.minute,
       'notes': notes,
       'routeIds': routeIds,
       'createdAt': Timestamp.fromDate(createdAt),

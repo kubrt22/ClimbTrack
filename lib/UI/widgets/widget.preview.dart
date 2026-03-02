@@ -12,6 +12,7 @@ Widget sessionListTilePreview() {
       home: Scaffold(
         body: Center(
           child: SessionListTile(
+            id: 'preview_session_id',
             title: 'Morning session',
             location: 'Boulder Gym',
             ascentsCount: 12,

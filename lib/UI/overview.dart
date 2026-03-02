@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/provider/auth_provider.dart';
 import 'package:climb_track/provider/riverpod.dart';
 import 'package:climb_track/provider/firebase_provider.dart';
-import 'package:climb_track/models/session_model.dart';
+import 'package:climb_track/UI/session/session_add.dart';
 import 'package:climb_track/UI/routes/route_add.dart';
 
 class OverviewPage extends ConsumerStatefulWidget {
@@ -38,15 +38,10 @@ class OverviewPage extends ConsumerStatefulWidget {
         if (user == null) return;
         final firestore = ref.read(firestoreServiceProvider);
         if (tabIndex == 0) {
-          final session = SessionModel(
-            id: '',
-            title: 'Nová session',
-            location: 'Neznámé místo',
-            durationMinutes: 90,
-            routeIds: ["6WhEwGgBmPUGP1gci0wI"],
-            createdAt: DateTime.now(),
+          Navigator.push(
+            ref.context,
+            MaterialPageRoute(builder: (context) => SessionAddPage()),
           );
-          firestore.addSession(user.uid, session);
         } else {
           Navigator.push(
             ref.context,
@@ -127,6 +122,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                               );
 
                               return SessionListTile(
+                                id: s.id,
                                 title: s.title,
                                 location: s.location,
                                 ascentsCount: sorted.length,

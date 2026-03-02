@@ -3,8 +3,6 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:climb_track/models/route_model.dart';
 import 'package:climb_track/models/session_model.dart';
-import 'package:flutter/material.dart';
-import 'package:climb_track/services/global_things.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -38,6 +36,24 @@ class FirestoreService {
             return <SessionModel>[];
           }
         });
+  }
+
+  Future<SessionModel?> getSession(String uid, String sessionId) async {
+    try {
+      final doc = await _sessionsRef(uid).doc(sessionId).get();
+      if (doc.exists) {
+        return SessionModel.fromFirestore(doc);
+      } else {
+        log('Session with ID $sessionId not found for user $uid');
+        return null;
+      }
+    } on FirebaseException catch (e) {
+      log('Firestore error fetching session: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error fetching session: $e');
+      rethrow;
+    }
   }
 
   Future<void> addSession(String uid, SessionModel session) async {
