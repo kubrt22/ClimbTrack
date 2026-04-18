@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:climb_track/UI/widgets/session_list_item.dart';
 import 'package:climb_track/UI/widgets/route_list_item.dart';
+import 'package:climb_track/models/route_model.dart';
+import 'package:climb_track/models/session_model.dart';
+import 'package:climb_track/models/user_settings_model.dart';
 import 'package:climb_track/services/global_things.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/provider/auth_provider.dart';
 import 'package:climb_track/provider/riverpod.dart';
 import 'package:climb_track/provider/firebase_provider.dart';
+import 'package:climb_track/provider/settings_provider.dart';
 import 'package:climb_track/UI/session/session_add.dart';
 import 'package:climb_track/UI/routes/route_add.dart';
 
@@ -57,6 +61,42 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
+  void _sortSessions(List<SessionModel> sessions, OverviewSortSetting sort) {
+    switch (sort) {
+      case OverviewSortSetting.newestFirst:
+        sessions.sort((a, b) => b.date.compareTo(a.date));
+      case OverviewSortSetting.oldestFirst:
+        sessions.sort((a, b) => a.date.compareTo(b.date));
+      case OverviewSortSetting.titleAZ:
+        sessions.sort(
+          (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+        );
+      case OverviewSortSetting.locationAZ:
+        sessions.sort(
+          (a, b) =>
+              a.location.toLowerCase().compareTo(b.location.toLowerCase()),
+        );
+    }
+  }
+
+  void _sortRoutes(List<RouteModel> routes, OverviewSortSetting sort) {
+    switch (sort) {
+      case OverviewSortSetting.newestFirst:
+        routes.sort((a, b) => b.date.compareTo(a.date));
+      case OverviewSortSetting.oldestFirst:
+        routes.sort((a, b) => a.date.compareTo(b.date));
+      case OverviewSortSetting.titleAZ:
+        routes.sort(
+          (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+        );
+      case OverviewSortSetting.locationAZ:
+        routes.sort(
+          (a, b) =>
+              a.location.toLowerCase().compareTo(b.location.toLowerCase()),
+        );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -80,6 +120,9 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
   Widget build(BuildContext context) {
     final sessionsAsync = ref.watch(sessionsStreamProvider);
     final routesAsync = ref.watch(routesStreamProvider);
+    final settings = ref
+        .watch(userSettingsProvider)
+        .maybeWhen(data: (settings) => settings, orElse: UserSettings.defaults);
 
     return Column(
       children: [
@@ -102,74 +145,84 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   error: (err, stack) => Center(child: Text('Error: $err')),
-                  data: (sessions) => sessions.isEmpty
-                      ? const Center(child: Text('No sessions yet'))
-                      : ListView.separated(
-                          padding: const EdgeInsets.all(8.0),
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 8.0),
-                          itemCount: sessions.length,
-                          itemBuilder: (context, index) {
-                            final s = sessions[index];
-                            final sessionRoutes = ref.watch(
-                              sessionRoutesProvider(s.routeIds),
-                            );
-                            return sessionRoutes.when(
-                              loading: () => const SizedBox.shrink(),
-                              error: (err, stack) => const SizedBox.shrink(),
-                              data: (routes) {
-                                final sorted = List.from(routes);
-                                sorted.sort(
-                                  (a, b) => b.difficulty.index.compareTo(
-                                    a.difficulty.index,
-                                  ),
-                                );
+                  data: (sessions) {
+                    final sortedSessions = List<SessionModel>.from(sessions);
+                    _sortSessions(sortedSessions, settings.sessionsSort);
 
-                                return SessionListTile(
-                                  id: s.id,
-                                  title: s.title,
-                                  location: s.location,
-                                  ascentsCount: sorted.length,
-                                  difficulty: sorted.isNotEmpty
-                                      ? sorted.first.difficulty
-                                      : Difficulty(
-                                          DifficultyType.V_Scale,
-                                          "V0",
-                                        ),
-                                  color: sorted.isNotEmpty
-                                      ? sorted.first.routeColor
-                                      : Colors.grey,
-                                );
-                              },
-                            );
-                          },
-                        ),
+                    return sortedSessions.isEmpty
+                        ? const Center(child: Text('No sessions yet'))
+                        : ListView.separated(
+                            padding: const EdgeInsets.all(8.0),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 8.0),
+                            itemCount: sortedSessions.length,
+                            itemBuilder: (context, index) {
+                              final s = sortedSessions[index];
+                              final sessionRoutes = ref.watch(
+                                sessionRoutesProvider(s.routeIds),
+                              );
+                              return sessionRoutes.when(
+                                loading: () => const SizedBox.shrink(),
+                                error: (err, stack) => const SizedBox.shrink(),
+                                data: (routes) {
+                                  final sorted = List.from(routes);
+                                  sorted.sort(
+                                    (a, b) => b.difficulty.index.compareTo(
+                                      a.difficulty.index,
+                                    ),
+                                  );
+
+                                  return SessionListTile(
+                                    id: s.id,
+                                    title: s.title,
+                                    location: s.location,
+                                    ascentsCount: sorted.length,
+                                    difficulty: sorted.isNotEmpty
+                                        ? sorted.first.difficulty
+                                        : Difficulty(
+                                            DifficultyType.V_Scale,
+                                            "V0",
+                                          ),
+                                    color: sorted.isNotEmpty
+                                        ? sorted.first.routeColor
+                                        : Colors.grey,
+                                  );
+                                },
+                              );
+                            },
+                          );
+                  },
                 ),
                 routesAsync.when(
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   error: (err, stack) => Center(child: Text('Error: $err')),
-                  data: (routes) => routes.isEmpty
-                      ? const Center(child: Text('No routes yet'))
-                      : ListView.separated(
-                          padding: const EdgeInsets.all(8.0),
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 8.0),
-                          itemCount: routes.length,
-                          itemBuilder: (context, index) {
-                            final r = routes[index];
-                            return RouteListTile(
-                              id: r.id,
-                              title: r.title,
-                              location: r.location,
-                              date: r.date,
-                              climbType: r.climbType,
-                              climbStyle: r.climbStyle,
-                              difficulty: r.difficulty,
-                              color: r.routeColor,
-                            );
-                          },
-                        ),
+                  data: (routes) {
+                    final sortedRoutes = List<RouteModel>.from(routes);
+                    _sortRoutes(sortedRoutes, settings.routesSort);
+
+                    return sortedRoutes.isEmpty
+                        ? const Center(child: Text('No routes yet'))
+                        : ListView.separated(
+                            padding: const EdgeInsets.all(8.0),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 8.0),
+                            itemCount: sortedRoutes.length,
+                            itemBuilder: (context, index) {
+                              final r = sortedRoutes[index];
+                              return RouteListTile(
+                                id: r.id,
+                                title: r.title,
+                                location: r.location,
+                                date: r.date,
+                                climbType: r.climbType,
+                                climbStyle: r.climbStyle,
+                                difficulty: r.difficulty,
+                                color: r.routeColor,
+                              );
+                            },
+                          );
+                  },
                 ),
               ],
             ),

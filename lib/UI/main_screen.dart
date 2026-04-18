@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:climb_track/UI/widgets/navigation.dart';
 import 'package:climb_track/UI/overview.dart';
+import 'package:climb_track/UI/settings/settings.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -60,7 +61,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         Container(child: const Center(child: Text('Přátelé'))),
 
         // - Settings page
-        Container(child: const Center(child: Text('Nastavení'))),
+        SettingsPage(),
       ][_currentIndex],
     );
   }

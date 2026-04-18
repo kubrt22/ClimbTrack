@@ -3,9 +3,76 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:climb_track/models/route_model.dart';
 import 'package:climb_track/models/session_model.dart';
+import 'package:climb_track/models/user_settings_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  DocumentReference<Map<String, dynamic>> _settingsRef(String uid) {
+    try {
+      return _db.collection('users').doc(uid).collection('settings').doc('app');
+    } on FirebaseException catch (e) {
+      log('Firestore error accessing settings document: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error accessing settings document: $e');
+      rethrow;
+    }
+  }
+
+  Stream<UserSettings> userSettingsStream(String uid) {
+    return _settingsRef(uid)
+        .snapshots()
+        .handleError((error) {
+          log('Error fetching user settings stream: $error');
+        })
+        .map((snap) {
+          return UserSettings.fromMap(snap.data());
+        });
+  }
+
+  Future<UserSettings> getUserSettings(String uid) async {
+    try {
+      final doc = await _settingsRef(uid).get();
+      return UserSettings.fromMap(doc.data());
+    } on FirebaseException catch (e) {
+      log('Firestore error fetching user settings: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error fetching user settings: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> upsertUserSettings(String uid, UserSettings settings) async {
+    try {
+      await _settingsRef(uid).set({
+        ...settings.toMap(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      log('Firestore error upserting user settings: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error upserting user settings: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> patchUserSettings(String uid, Map<String, dynamic> patch) async {
+    try {
+      await _settingsRef(uid).set({
+        ...patch,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      log('Firestore error patching user settings: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error patching user settings: $e');
+      rethrow;
+    }
+  }
 
   CollectionReference _sessionsRef(String uid) {
     try {
@@ -88,6 +155,34 @@ class FirestoreService {
       rethrow;
     } catch (e) {
       log('Unexpected error deleting session: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<SessionModel>> getAllSessions(String uid) async {
+    try {
+      final snap = await _sessionsRef(
+        uid,
+      ).orderBy('createdAt', descending: true).get();
+      return snap.docs.map((doc) => SessionModel.fromFirestore(doc)).toList();
+    } on FirebaseException catch (e) {
+      log('Firestore error fetching all sessions: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error fetching all sessions: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteAllSessions(String uid) async {
+    try {
+      final snap = await _sessionsRef(uid).get();
+      await _deleteDocsInBatches(snap.docs);
+    } on FirebaseException catch (e) {
+      log('Firestore error deleting all sessions: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error deleting all sessions: $e');
       rethrow;
     }
   }
@@ -193,6 +288,48 @@ class FirestoreService {
     } catch (e) {
       log('Unexpected error deleting route: $e');
       rethrow;
+    }
+  }
+
+  Future<List<RouteModel>> getAllRoutes(String uid) async {
+    try {
+      final snap = await _routesRef(
+        uid,
+      ).orderBy('createdAt', descending: true).get();
+      return snap.docs.map((doc) => RouteModel.fromFirestore(doc)).toList();
+    } on FirebaseException catch (e) {
+      log('Firestore error fetching all routes: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error fetching all routes: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteAllRoutes(String uid) async {
+    try {
+      final snap = await _routesRef(uid).get();
+      await _deleteDocsInBatches(snap.docs);
+    } on FirebaseException catch (e) {
+      log('Firestore error deleting all routes: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error deleting all routes: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> _deleteDocsInBatches(
+    List<QueryDocumentSnapshot<Object?>> docs,
+  ) async {
+    const batchSize = 400;
+    for (int i = 0; i < docs.length; i += batchSize) {
+      final batch = _db.batch();
+      final end = i + batchSize > docs.length ? docs.length : i + batchSize;
+      for (int j = i; j < end; j++) {
+        batch.delete(docs[j].reference);
+      }
+      await batch.commit();
     }
   }
 }

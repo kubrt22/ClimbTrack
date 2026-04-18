@@ -6,6 +6,7 @@ import 'package:climb_track/services/global_things.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/provider/auth_provider.dart';
 import 'package:climb_track/provider/firebase_provider.dart';
+import 'package:climb_track/provider/settings_provider.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class RouteAddPage extends ConsumerStatefulWidget {
@@ -27,6 +28,7 @@ class _RouteAddPageState extends ConsumerState<RouteAddPage> {
   ClimbType? _selectedClimbType;
   Set<ClimbStyle> _selectedClimbStyle = {};
   String _notes = '';
+  bool _appliedSettingsDefaults = false;
   final TextEditingController _locationController = TextEditingController();
 
   @override
@@ -47,6 +49,7 @@ class _RouteAddPageState extends ConsumerState<RouteAddPage> {
           ? {}
           : {initialRoute.climbStyle!};
       _notes = initialRoute.notes;
+      _appliedSettingsDefaults = true;
     }
 
     _locationController.addListener(() {
@@ -173,6 +176,7 @@ class _RouteAddPageState extends ConsumerState<RouteAddPage> {
 
   @override
   Widget build(BuildContext context) {
+    final settingsAsync = ref.watch(userSettingsProvider);
     final routesAsync = ref.watch(routesStreamProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final dropdownFieldTheme = Theme.of(context).copyWith(
@@ -205,6 +209,27 @@ class _RouteAddPageState extends ConsumerState<RouteAddPage> {
       },
       orElse: () => <String>[],
     );
+
+    settingsAsync.whenData((settings) {
+      if (_appliedSettingsDefaults || widget.initialRoute != null) return;
+
+      final defaultType = settings.defaultDifficultyType;
+      final defaultColor = settings.preferredRouteStartColor;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted ||
+            _appliedSettingsDefaults ||
+            widget.initialRoute != null) {
+          return;
+        }
+
+        setState(() {
+          _selectedType = defaultType;
+          _selectedValue = difficultyValues[defaultType]!.first;
+          _selectedColor = defaultColor;
+          _appliedSettingsDefaults = true;
+        });
+      });
+    });
 
     return Scaffold(
       appBar: AppBar(

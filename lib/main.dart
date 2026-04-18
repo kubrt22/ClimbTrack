@@ -4,6 +4,7 @@ import 'package:climb_track/logic/auth_gate.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:climb_track/theme.dart';
+import 'package:climb_track/provider/settings_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,12 +18,14 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(effectiveThemeModeProvider);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: AuthGate(),
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark,
+      themeMode: themeMode,
     );
   }
 }
