@@ -57,16 +57,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         OverviewPage(),
 
         // - Friends page
-        Container(
-          color: Colors.white,
-          child: const Center(child: Text('Přátelé')),
-        ),
+        Container(child: const Center(child: Text('Přátelé'))),
 
         // - Settings page
-        Container(
-          color: Colors.white,
-          child: const Center(child: Text('Nastavení')),
-        ),
+        Container(child: const Center(child: Text('Nastavení'))),
       ][_currentIndex],
     );
   }

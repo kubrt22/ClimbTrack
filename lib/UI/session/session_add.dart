@@ -137,7 +137,10 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
                 onPressed: _selectDate,
                 child: Text(
                   'Datum: ${_selectedDate.day}.${_selectedDate.month}.${_selectedDate.year}',
-                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                  ),
                 ),
               ),
               OutlinedButton(
@@ -158,7 +161,10 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
                 onPressed: _selectDuration,
                 child: Text(
                   'Délka: ${_selectedDuration == null ? 'Nezvoleno' : '${_selectedDuration!.hour}h ${_selectedDuration!.minute}min'}',
-                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                  ),
                 ),
               ),
 
@@ -183,7 +189,7 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
                   ),
                   Text(
                     _selectedRouteIds.length.toString(),
-                    style: TextStyle(fontSize: 18, color: Colors.black87),
+                    style: TextStyle(fontSize: 18),
                   ),
                 ],
               ),
@@ -251,11 +257,11 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
               padding: const EdgeInsets.only(right: 16),
 
               decoration: BoxDecoration(
-                color: Colors.red,
+                color: Theme.of(context).colorScheme.onPrimary,
                 borderRadius: BorderRadius.circular(8),
               ),
 
-              child: const Icon(Icons.delete, color: Colors.white),
+              child: const Icon(Icons.delete),
             ),
             onDismissed: (direction) => setState(() {
               _selectedRouteIds = _selectedRouteIds

@@ -90,7 +90,7 @@ class _SessionDetailsPageState extends ConsumerState<SessionDetailsPage> {
               children: [
                 Text(
                   "Místo",
-                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 Text(session.location, style: TextStyle(fontSize: 18)),
               ],
@@ -100,7 +100,7 @@ class _SessionDetailsPageState extends ConsumerState<SessionDetailsPage> {
               children: [
                 Text(
                   "Datum",
-                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   "${session.date.day}.${session.date.month}.${session.date.year}",
@@ -113,7 +113,7 @@ class _SessionDetailsPageState extends ConsumerState<SessionDetailsPage> {
               children: [
                 Text(
                   "Délka",
-                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   session.duration == null
@@ -129,7 +129,7 @@ class _SessionDetailsPageState extends ConsumerState<SessionDetailsPage> {
               children: [
                 Text(
                   "Poznámky",
-                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 Text(session.notes, style: TextStyle(fontSize: 18)),
               ],
@@ -146,7 +146,7 @@ class _SessionDetailsPageState extends ConsumerState<SessionDetailsPage> {
                 ),
                 Text(
                   routesAsync.value?.length.toString() ?? '0',
-                  style: TextStyle(fontSize: 18, color: Colors.black87),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),

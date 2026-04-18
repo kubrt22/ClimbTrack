@@ -103,18 +103,8 @@ class _RouteListTileState extends ConsumerState<RouteListTile> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      widget.difficulty.value,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium!.copyWith(color: Colors.white),
-                    ),
-                    Text(
-                      widget.climbStyle?.name ?? '',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium!.copyWith(color: Colors.white),
-                    ),
+                    Text(widget.difficulty.value),
+                    Text(widget.climbStyle?.name ?? ''),
                   ],
                 ),
               ),

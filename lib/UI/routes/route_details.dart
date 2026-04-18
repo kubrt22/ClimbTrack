@@ -94,7 +94,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage> {
                       children: [
                         Text(
                           "Místo",
-                          style: TextStyle(fontSize: 12, color: Colors.black87),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(route.location, style: TextStyle(fontSize: 18)),
                       ],
@@ -104,7 +107,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage> {
                       children: [
                         Text(
                           "Datum",
-                          style: TextStyle(fontSize: 12, color: Colors.black87),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           "${route.date.day}.${route.date.month}.${route.date.year}",
@@ -117,7 +123,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage> {
                       children: [
                         Text(
                           "Obtížnost",
-                          style: TextStyle(fontSize: 12, color: Colors.black87),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           route.difficulty.value,
@@ -130,7 +139,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage> {
                       children: [
                         Text(
                           "Typ cesty",
-                          style: TextStyle(fontSize: 12, color: Colors.black87),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           route.climbType.name,
@@ -147,7 +159,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage> {
                             "Styl",
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
@@ -166,7 +178,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage> {
               children: [
                 Text(
                   "Poznámky",
-                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 Text(route.notes, style: TextStyle(fontSize: 18)),
               ],

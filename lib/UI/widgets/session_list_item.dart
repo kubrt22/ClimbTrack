@@ -38,16 +38,19 @@ class _SessionListTileState extends ConsumerState<SessionListTile> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Theme.of(context).scaffoldBackgroundColor,
       borderRadius: BorderRadius.circular(8.0),
       child: InkWell(
         onTap: _openSessionDetails,
         borderRadius: BorderRadius.circular(8.0),
+
         child: Container(
           height: 80.0,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: Color(0xFF49454F), width: 1.0),
+            border: Border.all(
+              color: Theme.of(context).dividerColor,
+              width: 1.0,
+            ),
           ),
           child: Row(
             children: [

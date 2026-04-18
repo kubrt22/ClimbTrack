@@ -122,7 +122,10 @@ class _RouteAddPageState extends ConsumerState<RouteAddPage> {
                 onPressed: _selectDate,
                 child: Text(
                   'Datum: ${_selectedDate.day}.${_selectedDate.month}.${_selectedDate.year}',
-                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                  ),
                 ),
               ),
               DropdownButtonFormField<DifficultyType>(
@@ -188,7 +191,10 @@ class _RouteAddPageState extends ConsumerState<RouteAddPage> {
                       decoration: BoxDecoration(
                         color: _selectedColor,
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.black26),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          width: 1,
+                        ),
                       ),
                     ),
                   ),
