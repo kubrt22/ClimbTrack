@@ -20,20 +20,6 @@ class OverviewPage extends ConsumerStatefulWidget {
   @override
   ConsumerState<OverviewPage> createState() => _OverviewPageState();
 
-  static AppBar buildAppBar(WidgetRef ref) {
-    final auth = ref.read(authServiceProvider);
-
-    return AppBar(
-      title: const Text('Přehled'),
-      actions: [
-        IconButton(
-          onPressed: () async => await auth.signOut(),
-          icon: const Icon(Icons.logout),
-        ),
-      ],
-    );
-  }
-
   static FloatingActionButton buildFAB(WidgetRef ref) {
     final tabIndex = ref.watch(overviewTabIndexProvider);
     return FloatingActionButton(
@@ -60,6 +46,32 @@ class OverviewPage extends ConsumerStatefulWidget {
 class _OverviewPageState extends ConsumerState<OverviewPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+
+  bool _sessionMatchesQuery(SessionModel session, String query) {
+    if (query.isEmpty) return true;
+
+    final dateText =
+        '${session.date.day}.${session.date.month}.${session.date.year}';
+    return session.title.toLowerCase().contains(query) ||
+        session.location.toLowerCase().contains(query) ||
+        session.notes.toLowerCase().contains(query) ||
+        dateText.contains(query);
+  }
+
+  bool _routeMatchesQuery(RouteModel route, String query) {
+    if (query.isEmpty) return true;
+
+    final dateText = '${route.date.day}.${route.date.month}.${route.date.year}';
+    final climbStyle = route.climbStyle?.name.toLowerCase() ?? '';
+    return route.title.toLowerCase().contains(query) ||
+        route.location.toLowerCase().contains(query) ||
+        route.notes.toLowerCase().contains(query) ||
+        route.climbType.name.toLowerCase().contains(query) ||
+        climbStyle.contains(query) ||
+        route.difficulty.value.toLowerCase().contains(query) ||
+        route.difficulty.typeName.toLowerCase().contains(query) ||
+        dateText.contains(query);
+  }
 
   void _sortSessions(List<SessionModel> sessions, OverviewSortSetting sort) {
     switch (sort) {
@@ -123,6 +135,10 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
     final settings = ref
         .watch(userSettingsProvider)
         .maybeWhen(data: (settings) => settings, orElse: UserSettings.defaults);
+    final searchQuery = ref
+        .watch(overviewSearchQueryProvider)
+        .trim()
+        .toLowerCase();
 
     return Column(
       children: [
@@ -148,16 +164,28 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                   data: (sessions) {
                     final sortedSessions = List<SessionModel>.from(sessions);
                     _sortSessions(sortedSessions, settings.sessionsSort);
+                    final filteredSessions = sortedSessions
+                        .where(
+                          (session) =>
+                              _sessionMatchesQuery(session, searchQuery),
+                        )
+                        .toList();
 
-                    return sortedSessions.isEmpty
-                        ? const Center(child: Text('No sessions yet'))
+                    return filteredSessions.isEmpty
+                        ? Center(
+                            child: Text(
+                              searchQuery.isEmpty
+                                  ? 'No sessions yet'
+                                  : 'No matching sessions',
+                            ),
+                          )
                         : ListView.separated(
                             padding: const EdgeInsets.all(8.0),
                             separatorBuilder: (context, index) =>
                                 const SizedBox(height: 8.0),
-                            itemCount: sortedSessions.length,
+                            itemCount: filteredSessions.length,
                             itemBuilder: (context, index) {
-                              final s = sortedSessions[index];
+                              final s = filteredSessions[index];
                               final sessionRoutes = ref.watch(
                                 sessionRoutesProvider(s.routeIds),
                               );
@@ -200,16 +228,27 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
                   data: (routes) {
                     final sortedRoutes = List<RouteModel>.from(routes);
                     _sortRoutes(sortedRoutes, settings.routesSort);
+                    final filteredRoutes = sortedRoutes
+                        .where(
+                          (route) => _routeMatchesQuery(route, searchQuery),
+                        )
+                        .toList();
 
-                    return sortedRoutes.isEmpty
-                        ? const Center(child: Text('No routes yet'))
+                    return filteredRoutes.isEmpty
+                        ? Center(
+                            child: Text(
+                              searchQuery.isEmpty
+                                  ? 'No routes yet'
+                                  : 'No matching routes',
+                            ),
+                          )
                         : ListView.separated(
                             padding: const EdgeInsets.all(8.0),
                             separatorBuilder: (context, index) =>
                                 const SizedBox(height: 8.0),
-                            itemCount: sortedRoutes.length,
+                            itemCount: filteredRoutes.length,
                             itemBuilder: (context, index) {
-                              final r = sortedRoutes[index];
+                              final r = filteredRoutes[index];
                               return RouteListTile(
                                 id: r.id,
                                 title: r.title,

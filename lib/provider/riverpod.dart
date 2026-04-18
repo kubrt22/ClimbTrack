@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:climb_track/provider/auth_provider.dart';
 
 class OverviewTabNotifier extends Notifier<int> {
   @override
@@ -13,3 +12,21 @@ class OverviewTabNotifier extends Notifier<int> {
 final overviewTabIndexProvider = NotifierProvider<OverviewTabNotifier, int>(
   OverviewTabNotifier.new,
 );
+
+class OverviewSearchQueryNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void setQuery(String query) {
+    state = query;
+  }
+
+  void clear() {
+    state = '';
+  }
+}
+
+final overviewSearchQueryProvider =
+    NotifierProvider<OverviewSearchQueryNotifier, String>(
+      OverviewSearchQueryNotifier.new,
+    );
