@@ -142,6 +142,12 @@ enum ClimbStyle { Onsight, Flash }
 
 void showError(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message), backgroundColor: Colors.red[900]),
+    SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(color: Theme.of(context).colorScheme.onError),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.error,
+    ),
   );
 }

@@ -26,6 +26,13 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
   List<String> _selectedRouteIds = [];
   final TextEditingController _locationController = TextEditingController();
 
+  void _dismissActiveFocus() {
+    final focused = FocusManager.instance.primaryFocus;
+    if (focused != null && focused.hasFocus) {
+      focused.unfocus();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -172,12 +179,12 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
                 initialValue: _title,
                 onChanged: (value) => _title = value,
                 decoration: InputDecoration(
-                  labelText: 'Název cesty',
+                  labelText: 'Název session',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Zadejte název cesty';
+                    return 'Zadejte název session';
                   }
                   return null;
                 },
@@ -305,6 +312,8 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
 
               FilledButton(
                 onPressed: () async {
+                  _dismissActiveFocus();
+
                   final selected = await Navigator.push<List<String>>(
                     ref.context,
                     MaterialPageRoute(
@@ -313,6 +322,10 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
                       ),
                     ),
                   );
+                  if (!mounted) return;
+
+                  _dismissActiveFocus();
+
                   if (selected != null) {
                     setState(() {
                       _selectedRouteIds = selected;

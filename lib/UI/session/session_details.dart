@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/provider/auth_provider.dart';
 import 'package:climb_track/provider/firebase_provider.dart';
-import 'package:climb_track/UI/routes/route_select.dart';
 import 'package:climb_track/services/global_things.dart';
 import 'package:climb_track/UI/session/session_add.dart';
 

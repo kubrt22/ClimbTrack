@@ -153,7 +153,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
         ),
         Expanded(
           child: ColoredBox(
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: Theme.of(context).scaffoldBackgroundColor,
             child: TabBarView(
               controller: _tabController,
               children: [

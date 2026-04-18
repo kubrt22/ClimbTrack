@@ -38,6 +38,7 @@ class _SessionListTileState extends ConsumerState<SessionListTile> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Theme.of(context).colorScheme.surfaceContainer,
       borderRadius: BorderRadius.circular(8.0),
       clipBehavior: Clip.antiAlias,
       child: InkWell(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:climb_track/UI/widgets/navigation.dart';
+import 'package:climb_track/UI/friends/friends_page.dart';
 import 'package:climb_track/UI/overview.dart';
 import 'package:climb_track/UI/settings/settings.dart';
 import 'package:climb_track/provider/riverpod.dart';
@@ -220,7 +221,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           ],
         );
       case 1:
-        return AppBar(title: const Text('Přátelé'));
+        return FriendsPage.buildAppBar(ref);
       case 2:
         return AppBar(title: const Text('Nastavení'));
       default:
@@ -232,6 +233,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     switch (_currentIndex) {
       case 0:
         return OverviewPage.buildFAB(ref);
+      case 1:
+        return FriendsPage.buildFAB(ref);
       default:
         return null;
     }
@@ -252,7 +255,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         OverviewPage(),
 
         // - Friends page
-        Container(child: const Center(child: Text('Přátelé'))),
+        FriendsPage(),
 
         // - Settings page
         SettingsPage(),

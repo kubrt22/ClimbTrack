@@ -50,7 +50,7 @@ class _RouteListTileState extends ConsumerState<RouteListTile> {
         : Colors.black;
 
     return Material(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: Theme.of(context).colorScheme.surfaceContainer,
       borderRadius: BorderRadius.circular(8.0),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -59,7 +59,10 @@ class _RouteListTileState extends ConsumerState<RouteListTile> {
           height: 80.0,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: Color(0xFF49454F), width: 1.0),
+            border: Border.all(
+              color: Theme.of(context).dividerColor,
+              width: 1.0,
+            ),
           ),
           child: Row(
             children: [

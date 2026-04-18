@@ -1,7 +1,22 @@
 import 'package:climb_track/provider/auth_provider.dart';
+import 'package:climb_track/provider/firebase_provider.dart';
 import 'package:climb_track/UI/widgets/settings_list_item.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final accountUsernameProvider = StreamProvider.family<String?, String>((
+  ref,
+  uid,
+) {
+  return ref.watch(firestoreServiceProvider).watchUserProfile(uid).map((
+    profile,
+  ) {
+    final username = profile?.username.trim() ?? '';
+    if (username.isEmpty) return null;
+    return username;
+  });
+});
 
 class SettingsAccountPage extends ConsumerStatefulWidget {
   const SettingsAccountPage({super.key});
@@ -44,6 +59,12 @@ class _SettingsAccountPageState extends ConsumerState<SettingsAccountPage> {
     setState(() => _busy = true);
     try {
       await ref.read(authServiceProvider).signOut();
+      if (!mounted) return;
+
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).popUntil((route) => route.isFirst);
     } finally {
       if (mounted) {
         setState(() => _busy = false);
@@ -53,7 +74,32 @@ class _SettingsAccountPageState extends ConsumerState<SettingsAccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authStateProvider).value;
+    final user =
+        ref.watch(authStateProvider).value ?? FirebaseAuth.instance.currentUser;
+    final displayName = user?.displayName?.trim() ?? '';
+    final authUsernameFallback = displayName.isNotEmpty
+        ? displayName
+        : 'Nezadáno';
+
+    final usernameAsync = user == null
+        ? const AsyncValue<String?>.data(null)
+        : ref.watch(accountUsernameProvider(user.uid));
+
+    final usernameSubtitle = user == null
+        ? 'Nezadáno'
+        : usernameAsync.when(
+            data: (username) {
+              final value = username?.trim() ?? '';
+              if (value.isNotEmpty) return value;
+              return authUsernameFallback;
+            },
+            loading: () {
+              if (displayName.isNotEmpty) return displayName;
+              return 'Načítám...';
+            },
+            error: (_, __) => authUsernameFallback,
+          );
+
     final appButtonStyle = ButtonStyle(
       minimumSize: WidgetStateProperty.all(const Size(double.infinity, 56)),
       shape: const WidgetStatePropertyAll(
@@ -71,7 +117,7 @@ class _SettingsAccountPageState extends ConsumerState<SettingsAccountPage> {
           SettingsListItem(
             icon: Icons.person_outline_rounded,
             title: 'Uživatelské jméno',
-            subtitle: user?.displayName ?? 'Nezadáno',
+            subtitle: usernameSubtitle,
           ),
           const SizedBox(height: 8),
           SettingsListItem(

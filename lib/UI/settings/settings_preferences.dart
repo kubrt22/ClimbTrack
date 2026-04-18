@@ -85,9 +85,7 @@ class SettingsPreferencesPage extends ConsumerWidget {
                 .setPreferredRouteStartColor(pickedColor)
                 .catchError((_) {
                   if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Nepodařilo se uložit barvu')),
-                  );
+                  showError(context, 'Nepodařilo se uložit barvu');
                 });
           }
 
@@ -127,12 +125,9 @@ class SettingsPreferencesPage extends ConsumerWidget {
                             .setDefaultDifficultyType(value)
                             .catchError((_) {
                               if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Nepodařilo se uložit preferenci',
-                                  ),
-                                ),
+                              showError(
+                                context,
+                                'Nepodařilo se uložit preferenci',
                               );
                             });
                       },
@@ -221,11 +216,7 @@ class SettingsPreferencesPage extends ConsumerWidget {
                             .setSessionsSort(value)
                             .catchError((_) {
                               if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Nepodařilo se uložit řazení'),
-                                ),
-                              );
+                              showError(context, 'Nepodařilo se uložit řazení');
                             });
                       },
                     ),
@@ -266,11 +257,7 @@ class SettingsPreferencesPage extends ConsumerWidget {
                             .setRoutesSort(value)
                             .catchError((_) {
                               if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Nepodařilo se uložit řazení'),
-                                ),
-                              );
+                              showError(context, 'Nepodařilo se uložit řazení');
                             });
                       },
                     ),

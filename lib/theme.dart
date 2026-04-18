@@ -11,9 +11,6 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryCoral,
-        primary: primaryCoral,
-        surface: creamWhite,
-        onSurface: darkCharcoal,
         brightness: Brightness.light,
       ),
     );
@@ -24,10 +21,6 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryCoral,
-        primary: primaryCoral,
-        surface: darkCharcoal,
-        onSurface: creamWhite,
-        surfaceContainerLowest: black,
         brightness: Brightness.dark,
       ),
     );
