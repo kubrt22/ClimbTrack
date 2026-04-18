@@ -15,24 +15,26 @@ class LoginWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(40, 160, 40, 0),
-      child: Column(
-        spacing: 30,
+    return SingleChildScrollView(
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(40, 160, 40, 0),
+        child: Column(
+          spacing: 30,
 
-        children: [
-          Text(
-            title,
-            style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-          ),
-          Text(subtitle, style: TextStyle(fontSize: 32)),
-          SizedBox(height: 10),
-          FilledButtonTheme(
-            data: FilledButtonThemeData(style: loginButtonStyle),
-            child: Column(spacing: 20, children: children),
-          ),
-        ],
+          children: [
+            Text(
+              title,
+              style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+            ),
+            Text(subtitle, style: TextStyle(fontSize: 32)),
+            SizedBox(height: 10),
+            FilledButtonTheme(
+              data: FilledButtonThemeData(style: loginButtonStyle),
+              child: Column(spacing: 20, children: children),
+            ),
+          ],
+        ),
       ),
     );
   }

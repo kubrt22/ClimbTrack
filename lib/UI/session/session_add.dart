@@ -9,7 +9,9 @@ import 'package:climb_track/provider/firebase_provider.dart';
 import 'package:climb_track/UI/routes/route_select.dart';
 
 class SessionAddPage extends ConsumerStatefulWidget {
-  const SessionAddPage({super.key});
+  const SessionAddPage({super.key, this.initialSession});
+
+  final SessionModel? initialSession;
 
   @override
   ConsumerState<SessionAddPage> createState() => _SessionAddPageState();
@@ -22,6 +24,33 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
   TimeOfDay? _selectedDuration;
   String _notes = '';
   List<String> _selectedRouteIds = [];
+  final TextEditingController _locationController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    final initialSession = widget.initialSession;
+    if (initialSession != null) {
+      _title = initialSession.title;
+      _location = initialSession.location;
+      _locationController.text = initialSession.location;
+      _selectedDate = initialSession.date;
+      _selectedDuration = initialSession.duration;
+      _notes = initialSession.notes;
+      _selectedRouteIds = List.from(initialSession.routeIds);
+    }
+
+    _locationController.addListener(() {
+      _location = _locationController.text.trim();
+    });
+  }
+
+  @override
+  void dispose() {
+    _locationController.dispose();
+    super.dispose();
+  }
 
   void _saveSession(BuildContext context) {
     if (!_formKey.currentState!.validate()) {
@@ -32,17 +61,23 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
     final user = ref.read(authStateProvider).value;
     if (user == null) return;
     final firestore = ref.read(firestoreServiceProvider);
+    final initialSession = widget.initialSession;
+    final isEditing = initialSession != null;
     final session = SessionModel(
-      id: '',
+      id: isEditing ? initialSession.id : '',
       title: _title,
       location: _location,
       date: _selectedDate,
       duration: _selectedDuration,
       routeIds: _selectedRouteIds,
       notes: _notes,
-      createdAt: DateTime.now(),
+      createdAt: isEditing ? initialSession.createdAt : DateTime.now(),
     );
-    firestore.addSession(user.uid, session);
+    if (isEditing) {
+      firestore.updateSession(user.uid, session);
+    } else {
+      firestore.addSession(user.uid, session);
+    }
     Navigator.pop(context);
   }
 
@@ -80,9 +115,44 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
 
   @override
   Widget build(BuildContext context) {
+    final sessionsAsync = ref.watch(sessionsStreamProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final dropdownFieldTheme = Theme.of(context).copyWith(
+      splashFactory: NoSplash.splashFactory,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+    );
+    final dropdownMenuStyle = MenuStyle(
+      maximumSize: const WidgetStatePropertyAll(Size.fromHeight(280)),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      ),
+      backgroundColor: WidgetStatePropertyAll(colorScheme.surface),
+      padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+    );
+    final recentLocations = sessionsAsync.maybeWhen(
+      data: (sessions) {
+        final uniqueKeys = <String>{};
+        final values = <String>[];
+        for (final session in sessions) {
+          final location = session.location.trim();
+          if (location.isEmpty) continue;
+          final key = location.toLowerCase();
+          if (uniqueKeys.add(key)) {
+            values.add(location);
+          }
+          if (values.length >= 8) break;
+        }
+        return values;
+      },
+      orElse: () => <String>[],
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Přidat session'),
+        title: Text(
+          widget.initialSession == null ? 'Přidat session' : 'Upravit session',
+        ),
         actions: [
           IconButton(
             onPressed: () => _saveSession(context),
@@ -99,6 +169,7 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
             spacing: 16,
             children: [
               TextFormField(
+                initialValue: _title,
                 onChanged: (value) => _title = value,
                 decoration: InputDecoration(
                   labelText: 'Název cesty',
@@ -111,12 +182,47 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
                   return null;
                 },
               ),
-              TextFormField(
-                onChanged: (value) => _location = value,
-                decoration: InputDecoration(
-                  labelText: 'Místo',
-                  border: OutlineInputBorder(),
-                ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return Theme(
+                    data: dropdownFieldTheme,
+                    child: DropdownMenu<String>(
+                      width: constraints.maxWidth,
+                      controller: _locationController,
+                      requestFocusOnTap: true,
+                      enableFilter: true,
+                      enableSearch: true,
+                      label: const Text('Místo'),
+                      hintText: recentLocations.isEmpty
+                          ? 'Zadejte místo'
+                          : 'Vyberte poslední nebo napište nové',
+                      textStyle: Theme.of(context).textTheme.bodyLarge,
+                      menuStyle: dropdownMenuStyle,
+                      trailingIcon: const Icon(Icons.keyboard_arrow_down_sharp),
+                      selectedTrailingIcon: const Icon(
+                        Icons.keyboard_arrow_up_sharp,
+                      ),
+                      dropdownMenuEntries: recentLocations
+                          .map(
+                            (location) => DropdownMenuEntry(
+                              value: location,
+                              label: location,
+                            ),
+                          )
+                          .toList(),
+                      onSelected: (value) {
+                        if (value == null) return;
+                        _locationController.value = TextEditingValue(
+                          text: value,
+                          selection: TextSelection.collapsed(
+                            offset: value.length,
+                          ),
+                        );
+                        _location = value;
+                      },
+                    ),
+                  );
+                },
               ),
 
               OutlinedButton(
@@ -169,6 +275,7 @@ class _SessionAddPageState extends ConsumerState<SessionAddPage> {
               ),
 
               TextFormField(
+                initialValue: _notes,
                 onChanged: (value) => _notes = value,
                 maxLines: 4,
                 decoration: InputDecoration(

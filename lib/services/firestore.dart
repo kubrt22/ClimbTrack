@@ -68,6 +68,18 @@ class FirestoreService {
     }
   }
 
+  Future<void> updateSession(String uid, SessionModel session) async {
+    try {
+      await _sessionsRef(uid).doc(session.id).update(session.toFirestore());
+    } on FirebaseException catch (e) {
+      log('Firestore error updating session: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error updating session: $e');
+      rethrow;
+    }
+  }
+
   Future<void> deleteSession(String uid, String sessionId) async {
     try {
       await _sessionsRef(uid).doc(sessionId).delete();
@@ -156,6 +168,18 @@ class FirestoreService {
       rethrow;
     } catch (e) {
       log('Unexpected error adding route: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateRoute(String uid, RouteModel route) async {
+    try {
+      await _routesRef(uid).doc(route.id).update(route.toFirestore());
+    } on FirebaseException catch (e) {
+      log('Firestore error updating route: ${e.message}');
+      rethrow;
+    } catch (e) {
+      log('Unexpected error updating route: $e');
       rethrow;
     }
   }

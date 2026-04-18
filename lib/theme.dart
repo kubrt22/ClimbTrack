@@ -4,6 +4,7 @@ class AppTheme {
   static const Color primaryCoral = Color(0xFFF45B69);
   static const Color darkCharcoal = Color(0xFF333232);
   static const Color creamWhite = Color(0xFFFBF9F1);
+  static const Color black = Color(0xFF151515);
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -26,6 +27,7 @@ class AppTheme {
         primary: primaryCoral,
         surface: darkCharcoal,
         onSurface: creamWhite,
+        surfaceContainerLowest: black,
         brightness: Brightness.dark,
       ),
     );

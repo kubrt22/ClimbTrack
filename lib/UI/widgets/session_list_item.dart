@@ -39,9 +39,9 @@ class _SessionListTileState extends ConsumerState<SessionListTile> {
   Widget build(BuildContext context) {
     return Material(
       borderRadius: BorderRadius.circular(8.0),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: _openSessionDetails,
-        borderRadius: BorderRadius.circular(8.0),
 
         child: Container(
           height: 80.0,
@@ -97,13 +97,7 @@ class _SessionListTileState extends ConsumerState<SessionListTile> {
               Ink(
                 width: 8.0,
                 height: double.infinity,
-                decoration: BoxDecoration(
-                  color: widget.color,
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(8.0),
-                    bottomRight: Radius.circular(8.0),
-                  ),
-                ),
+                decoration: BoxDecoration(color: widget.color),
               ),
             ],
           ),

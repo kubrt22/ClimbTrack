@@ -6,6 +6,7 @@ import 'package:climb_track/services/global_things.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:climb_track/provider/auth_provider.dart';
 import 'package:climb_track/provider/firebase_provider.dart';
+import 'package:climb_track/UI/routes/route_add.dart';
 
 class RouteDetailsPage extends ConsumerStatefulWidget {
   const RouteDetailsPage({super.key, required this.routeId});
@@ -65,6 +66,18 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage> {
       appBar: AppBar(
         title: Text(route.title),
         actions: [
+          IconButton(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RouteAddPage(initialRoute: route),
+                ),
+              );
+              _getRouteDetails();
+            },
+            icon: const Icon(Icons.edit),
+          ),
           IconButton(
             onPressed: () {
               final user = ref.read(authStateProvider).value;

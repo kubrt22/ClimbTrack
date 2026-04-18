@@ -8,6 +8,7 @@ import 'package:climb_track/provider/auth_provider.dart';
 import 'package:climb_track/provider/firebase_provider.dart';
 import 'package:climb_track/UI/routes/route_select.dart';
 import 'package:climb_track/services/global_things.dart';
+import 'package:climb_track/UI/session/session_add.dart';
 
 class SessionDetailsPage extends ConsumerStatefulWidget {
   const SessionDetailsPage({super.key, required this.sessionId});
@@ -67,6 +68,18 @@ class _SessionDetailsPageState extends ConsumerState<SessionDetailsPage> {
       appBar: AppBar(
         title: Text(session.title),
         actions: [
+          IconButton(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SessionAddPage(initialSession: session),
+                ),
+              );
+              _getRouteDetails();
+            },
+            icon: const Icon(Icons.edit),
+          ),
           IconButton(
             onPressed: () {
               final user = ref.read(authStateProvider).value;

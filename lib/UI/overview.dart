@@ -84,6 +84,8 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
     return Column(
       children: [
         TabBar(
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: const WidgetStatePropertyAll(Colors.transparent),
           controller: _tabController,
           tabs: const [
             Tab(text: "Sessions"),
@@ -92,7 +94,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
         ),
         Expanded(
           child: ColoredBox(
-            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             child: TabBarView(
               controller: _tabController,
               children: [

@@ -42,12 +42,19 @@ class _RouteListTileState extends ConsumerState<RouteListTile> {
 
   @override
   Widget build(BuildContext context) {
+    final climbStyleText = widget.climbStyle?.name.trim() ?? '';
+    final hasClimbStyle = climbStyleText.isNotEmpty;
+    final inkTextColor =
+        ThemeData.estimateBrightnessForColor(widget.color) == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
       borderRadius: BorderRadius.circular(8.0),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: _openRouteDetails,
-        borderRadius: BorderRadius.circular(8.0),
         child: Container(
           height: 80.0,
           decoration: BoxDecoration(
@@ -93,18 +100,21 @@ class _RouteListTileState extends ConsumerState<RouteListTile> {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 width: 80.0,
                 height: double.infinity,
-                decoration: BoxDecoration(
-                  color: widget.color,
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(8.0),
-                    bottomRight: Radius.circular(8.0),
-                  ),
-                ),
+                decoration: BoxDecoration(color: widget.color),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: hasClimbStyle
+                      ? MainAxisAlignment.spaceBetween
+                      : MainAxisAlignment.center,
                   children: [
-                    Text(widget.difficulty.value),
-                    Text(widget.climbStyle?.name ?? ''),
+                    Text(
+                      widget.difficulty.value,
+                      style: TextStyle(color: inkTextColor),
+                    ),
+                    if (hasClimbStyle)
+                      Text(
+                        climbStyleText,
+                        style: TextStyle(color: inkTextColor),
+                      ),
                   ],
                 ),
               ),
