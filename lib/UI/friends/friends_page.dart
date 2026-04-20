@@ -251,6 +251,7 @@ class _UserSearchDialogState extends ConsumerState<_UserSearchDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      scrollable: true,
       title: const Text('Najít uživatele'),
       content: SizedBox(
         width: 440,
